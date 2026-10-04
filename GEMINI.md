@@ -75,6 +75,40 @@ Sudah ter-*autoload* secara global via `BaseController`. Langsung panggil di *Vi
 - **`rupiah($angka, bool $with_symbol = true)`** -> Menghasilkan `Rp 5.000.000`
 - **`tanggal_indo($date, bool $print_day = false)`** -> Menghasilkan `17 Agustus 2026` atau `Senin, 17 Agustus 2026`. Juga otomatis menampilkan jam jika *string* waktu dikirimkan.
 
+### Manajemen Unggahan Gambar (Image Uploader)
+Sistem memiliki pustaka khusus untuk unggah gambar: `App\Libraries\ImageUploader`.
+- Mengubah format gambar ke WebP (hemat ruang).
+- Otomatis mengubah ukuran (*resize*) ke berbagai varian (misal: `thumb`, `md`, `lg`).
+- Memiliki fitur pemotongan menjadi persegi panjang (*square crop*) secara otomatis di *server*.
+
+**Cara Pakai (Controller):**
+```php
+$uploader = new \App\Libraries\ImageUploader('uploads/profiles/');
+// Meminta gambar di-crop jadi kotak, dan dikompres ke 2 ukuran
+$result = $uploader->process($this->request->getFile('image'), true, ['thumb' => 150, 'md' => 500]);
+if ($result['status'] === 'success') {
+    $namaWebp = $result['files']['original'];
+}
+```
+
+**Cara Pakai (Frontend / AJAX):**
+Telah disediakan helper JS global `uploadFileAjax(file, url, csrfToken, fieldName, onProgress, onSuccess, onError)` untuk mengunggah berkas menggunakan bilah kemajuan (*progress bar*) tanpa memuat ulang halaman (*reload*).
+
+### Manajemen Unggahan Dokumen (Document Uploader)
+Sistem juga memiliki pustaka khusus untuk unggah dokumen: `App\Libraries\DocumentUploader`.
+- Mengunci filter hanya untuk format aman (PDF, Word, Excel).
+- Otomatis menggunakan `getRandomName()` untuk mencegah bentrok dan eksploitasi.
+
+**Cara Pakai (Controller):**
+```php
+$docUploader = new \App\Libraries\DocumentUploader('uploads/documents/');
+$result = $docUploader->process($this->request->getFile('dokumen'));
+if ($result['status'] === 'success') {
+    $namaFile = $result['filename']; // Nama unik yang disimpan
+    $namaAsli = $result['original'];
+}
+```
+
 ## 5. Estetika (Wajib)
 Selalu gunakan *Dark Mode Support* dengan prefix `dark:`. Gunakan warna-warna premium (*slate*, *emerald*, *blue*) dan perhatikan kerapian *padding*, *margin*, dan sudut `rounded-lg` atau `rounded-xl`. Gunakan ikon *Phosphor* (`ph ph-nama-ikon`) bukan *FontAwesome*.
 

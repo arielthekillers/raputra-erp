@@ -328,6 +328,9 @@
         }
     </script>
     
+    <!-- Helpers -->
+    <script src="<?= base_url('js/uploader.js') ?>"></script>
+    
     <!-- Render custom scripts from views -->
     <?= $this->renderSection('scripts') ?>
 </body>

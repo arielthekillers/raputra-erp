@@ -82,12 +82,12 @@ class Filters extends BaseFilters
         'before' => [
             // 'honeypot',
             'csrf',
-            // 'invalidchars',
+            'invalidchars',
             'session' => ['except' => ['login*', 'register', 'auth/a/*']],
         ],
         'after' => [
             // 'honeypot',
-            // 'secureheaders',
+            'secureheaders',
         ],
     ];
 
