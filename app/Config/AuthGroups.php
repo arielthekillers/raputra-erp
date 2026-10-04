@@ -43,23 +43,31 @@ class AuthGroups extends ShieldAuthGroups
     public array $groups = [
         'superadmin' => [
             'title'       => 'Super Admin',
-            'description' => 'Complete control of the site.',
+            'description' => 'Akses penuh ke seluruh sistem ERP.',
         ],
-        'admin' => [
-            'title'       => 'Admin',
-            'description' => 'Day to day administrators of the site.',
+        'direksi' => [
+            'title'       => 'Direksi / Manajemen',
+            'description' => 'Hak akses pantau strategis dan pelaporan menyeluruh.',
         ],
-        'developer' => [
-            'title'       => 'Developer',
-            'description' => 'Site programmers.',
+        'finance_manager' => [
+            'title'       => 'Finance Manager',
+            'description' => 'Hak akses penuh ke modul Keuangan.',
+        ],
+        'finance_staff' => [
+            'title'       => 'Staff Keuangan',
+            'description' => 'Input transaksi dan operasional keuangan harian.',
+        ],
+        'hr_manager' => [
+            'title'       => 'HR Manager',
+            'description' => 'Hak akses penuh ke data SDM, Payroll, dan Karyawan.',
+        ],
+        'hr_staff' => [
+            'title'       => 'Staff HR',
+            'description' => 'Input kehadiran, data crew, dan operasional SDM.',
         ],
         'user' => [
-            'title'       => 'User',
-            'description' => 'General users of the site. Often customers.',
-        ],
-        'beta' => [
-            'title'       => 'Beta User',
-            'description' => 'Has access to beta-level features.',
+            'title'       => 'Karyawan Biasa',
+            'description' => 'Pengguna standar (Karyawan biasa).',
         ],
     ];
 
@@ -72,13 +80,18 @@ class AuthGroups extends ShieldAuthGroups
      * If a permission is not listed here it cannot be used.
      */
     public array $permissions = [
-        'admin.access'        => 'Can access the sites admin area',
-        'admin.settings'      => 'Can access the main site settings',
-        'users.manage-admins' => 'Can manage other admins',
-        'users.create'        => 'Can create new non-admin users',
-        'users.edit'          => 'Can edit existing non-admin users',
-        'users.delete'        => 'Can delete existing non-admin users',
-        'beta.access'         => 'Can access beta-level features',
+        'users.view'   => 'Dapat melihat daftar pengguna',
+        'users.create' => 'Dapat menambah pengguna baru',
+        'users.edit'   => 'Dapat mengubah data pengguna dan jabatannya',
+        'users.delete' => 'Dapat menghapus pengguna',
+        
+        'finance.view'   => 'Dapat melihat laporan & transaksi keuangan',
+        'finance.create' => 'Dapat membuat transaksi keuangan',
+        'finance.edit'   => 'Dapat menyetujui / mengubah data keuangan',
+        
+        'hr.view'   => 'Dapat melihat daftar absensi dan payroll',
+        'hr.create' => 'Dapat input kehadiran dan data HR baru',
+        'hr.edit'   => 'Dapat mengubah status karyawan dan menyetujui payroll',
     ];
 
     /**
@@ -91,27 +104,29 @@ class AuthGroups extends ShieldAuthGroups
      */
     public array $matrix = [
         'superadmin' => [
-            'admin.*',
             'users.*',
-            'beta.*',
+            'finance.*',
+            'hr.*',
         ],
-        'admin' => [
-            'admin.access',
-            'users.create',
-            'users.edit',
-            'users.delete',
-            'beta.access',
+        'direksi' => [
+            'users.view',
+            'finance.view',
+            'hr.view',
         ],
-        'developer' => [
-            'admin.access',
-            'admin.settings',
-            'users.create',
-            'users.edit',
-            'beta.access',
+        'finance_manager' => [
+            'finance.*',
+        ],
+        'finance_staff' => [
+            'finance.view',
+            'finance.create',
+        ],
+        'hr_manager' => [
+            'hr.*',
+        ],
+        'hr_staff' => [
+            'hr.view',
+            'hr.create',
         ],
         'user' => [],
-        'beta' => [
-            'beta.access',
-        ],
     ];
 }

@@ -7,7 +7,18 @@ Setiap kali sesi percakapan baru dimulai, Anda harus memastikan bahwa server dan
 - **Server CI4:** `php spark serve`
 - **Tailwind Watcher:** `npm run dev:css` (Penting: harus selalu berjalan agar perubahan kelas CSS otomatis ter-build).
 
-## 2. Struktur View & Template (Wajib Diikuti)
+## 2. Struktur HMVC (Code Modules)
+Sistem ERP ini menggunakan arsitektur **HMVC (Hierarchical Model-View-Controller)** yang diimplementasikan melalui *Code Modules* bawaan CodeIgniter 4.
+Setiap fitur besar (seperti *Inventory*, *Finance*, *HRD*) WAJIB dipisahkan ke dalam foldernya masing-masing di dalam direktori root `Modules/`.
+
+**Aturan Pembuatan Modul Baru:**
+1. Buat folder di `Modules/NamaModul/` yang berisi susunan standar CI4 (Controllers, Models, Views, Config).
+2. Modul baru **WAJIB didaftarkan (namespace)** ke dalam `app/Config/Autoload.php` pada *array* `$psr4`.
+   Contoh: `'Modules\NamaModul' => ROOTPATH . 'Modules/NamaModul',`
+3. Gunakan *namespace* secara disiplin di setiap *Controller* dan *Model* modul. (Misal: `namespace Modules\UserManagement\Controllers;`).
+4. Gunakan namespace saat merender View dari dalam modul. (Contoh: `return view('Modules\UserManagement\Views\index');`).
+
+## 3. Struktur View & Template (Wajib Diikuti)
 Semua halaman/View baru harus di-*extend* dari `layout/main` dan harus mendefinisikan *section* secara spesifik (TIDAK BOLEH *hardcode* header di dalam content).
 
 **Template View Standar:**
@@ -123,13 +134,13 @@ $html = view('modul/slip_gaji_pdf', $data);
 $pdf->generate($html, 'Slip_Gaji_Budi', 'A4', 'portrait', true);
 ```
 
-## 5. Estetika (Wajib)
+## 6. Estetika (Wajib)
 Selalu gunakan *Dark Mode Support* dengan prefix `dark:`. Gunakan warna-warna premium (*slate*, *emerald*, *blue*) dan perhatikan kerapian *padding*, *margin*, dan sudut `rounded-lg` atau `rounded-xl`. Gunakan ikon *Phosphor* (`ph ph-nama-ikon`) bukan *FontAwesome*.
 
-## 6. Evolusi Aturan (Self-Updating)
+## 7. Evolusi Aturan (Self-Updating)
 Jika dalam proses pengerjaan pembuatan modul atau *coding* kita menemukan pola, konvensi (*ruleset*), alat, atau *helper* baru yang terbukti bekerja dengan baik namun **belum** terdaftar di panduan ini, Anda (AI) WAJIB mendaftarkannya secara otomatis ke dalam dokumen `GEMINI.md` ini agar panduan tetap *up-to-date*.
 
-## 7. Aturan Git Commit
+## 8. Aturan Git Commit
 - Lakukan Git Commit sesuai dengan *Best Practice* (menggunakan pesan konvensi yang jelas seperti `fitur:`, `perbaikan:`, `refaktor:`).
 - Gunakan **Bahasa Indonesia** untuk seluruh pesan *commit*.
 - **PENTING:** JANGAN pernah melakukan proses *commit* secara otomatis sebelum ada instruksi/perintah eksplisit dari User. Kita menghindari sejarah *commit* yang terlalu kotor/banyak. Kumpulkan saja kodenya, dan hanya lakukan *commit* saat User bilang *"Silakan commit"*.
