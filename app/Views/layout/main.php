@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" x-data="{ darkMode: localStorage.getItem('theme') === 'dark' }" x-init="$watch('darkMode', val => localStorage.setItem('theme', val ? 'dark' : 'light'))" :class="{ 'dark': darkMode }">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,10 +8,20 @@
     <link href="<?= base_url('css/app.css') ?>" rel="stylesheet">
     <!-- Alpine.js untuk interaksi menu & dropdown (sangat ringan) -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!-- Phosphor Icons (Sangat cocok untuk desain ERP modern) -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Phosphor Icons (Menggunakan jsdelivr karena unpkg terkadang lambat) -->
+    <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        // Mencegah flash putih sebelum Alpine berjalan
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased overflow-hidden" x-data="{ sidebarOpen: false }">
+<body class="bg-gray-50 text-gray-800 dark:bg-slate-900 dark:text-slate-200 antialiased overflow-hidden" style="font-family: 'Inter', sans-serif;" x-data="{ sidebarOpen: false }">
 
     <div class="flex h-screen w-full">
         
@@ -19,12 +29,12 @@
         <div x-show="sidebarOpen" class="fixed inset-0 z-40 bg-gray-900/80 backdrop-blur-sm lg:hidden" x-transition.opacity @click="sidebarOpen = false"></div>
 
         <!-- Sidebar -->
-        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-50 w-72 flex flex-col bg-slate-900 text-slate-300 transition-transform duration-300 lg:static lg:translate-x-0 shadow-2xl lg:shadow-none border-r border-slate-800">
+        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-50 w-64 flex flex-col bg-white dark:bg-slate-900 text-gray-600 dark:text-slate-300 transition-transform duration-300 lg:static lg:translate-x-0 shadow-2xl lg:shadow-none border-r border-gray-200 dark:border-slate-800">
             <!-- Sidebar Header -->
-            <div class="flex items-center justify-between h-16 px-6 bg-slate-950 border-b border-slate-800 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/30">R</div>
-                    <span class="text-xl font-bold text-white tracking-wide">Raputra<span class="text-blue-400">ERP</span></span>
+            <div class="flex items-center justify-between h-14 px-4 bg-gray-50 dark:bg-slate-950 border-b border-gray-200 dark:border-slate-800 shrink-0">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/30 text-sm">R</div>
+                    <span class="text-lg font-bold text-gray-900 dark:text-white tracking-wide">Raputra<span class="text-blue-600 dark:text-blue-400">ERP</span></span>
                 </div>
                 <!-- Close Button (Mobile Only) -->
                 <button @click="sidebarOpen = false" class="lg:hidden text-slate-400 hover:text-white">
@@ -33,121 +43,143 @@
             </div>
 
             <!-- Sidebar Navigation -->
-            <div class="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-1 custom-scrollbar">
+            <div class="flex-1 overflow-y-auto overflow-x-hidden p-2 space-y-0.5 custom-scrollbar">
                 
                 <!-- Main Dashboard -->
-                <a href="<?= base_url() ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white <?= uri_string() == '' ? 'bg-blue-600/10 text-blue-400' : '' ?>">
-                    <i class="ph ph-squares-four text-lg"></i>
+                <a href="<?= base_url() ?>" class="group flex items-center gap-2 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white <?= uri_string() == '' ? 'bg-blue-50 text-blue-700 dark:bg-blue-600/10 dark:text-blue-400' : '' ?>">
+                    <i class="ph ph-squares-four text-base text-blue-500 dark:text-blue-400 group-hover:scale-110 transition-transform"></i>
                     <span>Dashboard</span>
                 </a>
 
-                <div class="pt-4 pb-2">
-                    <p class="px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Modul ERP</p>
+                <div class="pt-3 pb-1">
+                    <p class="px-3 text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">Modul ERP</p>
                 </div>
 
                 <!-- Modul Inventory (Dengan Submenu) -->
                 <div x-data="{ open: <?= strpos(uri_string(), 'inventory') === 0 ? 'true' : 'false' ?> }">
-                    <button @click="open = !open" class="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white <?= strpos(uri_string(), 'inventory') === 0 ? 'text-white' : '' ?>">
-                        <div class="flex items-center gap-3">
-                            <i class="ph ph-package text-lg"></i>
+                    <button @click="open = !open" class="group w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white <?= strpos(uri_string(), 'inventory') === 0 ? 'text-gray-900 dark:text-white' : '' ?>">
+                        <div class="flex items-center gap-2">
+                            <i class="ph ph-package text-base text-indigo-500 dark:text-indigo-400 group-hover:scale-110 transition-transform"></i>
                             <span>Inventory</span>
                         </div>
-                        <i class="ph ph-caret-down text-xs transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+                        <i class="ph ph-caret-down text-[10px] transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
                     </button>
                     <div x-show="open" x-collapse>
-                        <div class="pl-10 pr-3 py-1 mt-1 space-y-1 border-l-2 border-slate-800 ml-4">
-                            <a href="<?= base_url('inventory') ?>" class="block px-3 py-2 rounded-md text-sm transition-colors hover:bg-slate-800 hover:text-white">Dashboard Inventory</a>
-                            <a href="#" class="block px-3 py-2 rounded-md text-sm transition-colors hover:bg-slate-800 hover:text-white">Data Barang</a>
-                            <a href="#" class="block px-3 py-2 rounded-md text-sm transition-colors hover:bg-slate-800 hover:text-white">Kategori</a>
-                            <a href="#" class="block px-3 py-2 rounded-md text-sm transition-colors hover:bg-slate-800 hover:text-white">Stok Masuk/Keluar</a>
+                        <div class="pl-8 pr-2 py-0.5 mt-0.5 space-y-0.5 border-l border-gray-200 dark:border-slate-700 ml-4">
+                            <a href="<?= base_url('inventory') ?>" class="block px-2 py-1.5 rounded text-xs transition-colors <?= uri_string() == 'inventory' ? 'bg-indigo-50 text-indigo-700 font-semibold dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' ?>">Dashboard Inventory</a>
+                            <a href="#" class="block px-2 py-1.5 rounded text-xs transition-colors <?= uri_string() == 'inventory/items' ? 'bg-indigo-50 text-indigo-700 font-semibold dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' ?>">Data Barang</a>
+                            <a href="#" class="block px-2 py-1.5 rounded text-xs transition-colors <?= uri_string() == 'inventory/categories' ? 'bg-indigo-50 text-indigo-700 font-semibold dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' ?>">Kategori</a>
+                            <a href="#" class="block px-2 py-1.5 rounded text-xs transition-colors <?= uri_string() == 'inventory/stock' ? 'bg-indigo-50 text-indigo-700 font-semibold dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' ?>">Stok Masuk/Keluar</a>
                         </div>
                     </div>
                 </div>
 
                 <!-- Modul Keuangan (Submenu) -->
                 <div x-data="{ open: false }">
-                    <button @click="open = !open" class="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white">
-                        <div class="flex items-center gap-3">
-                            <i class="ph ph-wallet text-lg"></i>
+                    <button @click="open = !open" class="group w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white">
+                        <div class="flex items-center gap-2">
+                            <i class="ph ph-wallet text-base text-emerald-500 dark:text-emerald-400 group-hover:scale-110 transition-transform"></i>
                             <span>Keuangan</span>
                         </div>
-                        <i class="ph ph-caret-down text-xs transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+                        <i class="ph ph-caret-down text-[10px] transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
                     </button>
                     <div x-show="open" x-collapse>
-                        <div class="pl-10 pr-3 py-1 mt-1 space-y-1 border-l-2 border-slate-800 ml-4">
-                            <a href="#" class="block px-3 py-2 rounded-md text-sm transition-colors hover:bg-slate-800 hover:text-white">Kas & Bank</a>
-                            <a href="#" class="block px-3 py-2 rounded-md text-sm transition-colors hover:bg-slate-800 hover:text-white">Faktur Penjualan</a>
-                            <a href="#" class="block px-3 py-2 rounded-md text-sm transition-colors hover:bg-slate-800 hover:text-white">Laporan Laba/Rugi</a>
+                        <div class="pl-8 pr-2 py-0.5 mt-0.5 space-y-0.5 border-l border-gray-200 dark:border-slate-700 ml-4">
+                            <a href="#" class="block px-2 py-1.5 rounded text-xs transition-colors <?= uri_string() == 'finance/cash' ? 'bg-emerald-50 text-emerald-700 font-semibold dark:bg-emerald-500/10 dark:text-emerald-400' : 'text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' ?>">Kas & Bank</a>
+                            <a href="#" class="block px-2 py-1.5 rounded text-xs transition-colors <?= uri_string() == 'finance/invoices' ? 'bg-emerald-50 text-emerald-700 font-semibold dark:bg-emerald-500/10 dark:text-emerald-400' : 'text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' ?>">Faktur Penjualan</a>
+                            <a href="#" class="block px-2 py-1.5 rounded text-xs transition-colors <?= uri_string() == 'finance/reports' ? 'bg-emerald-50 text-emerald-700 font-semibold dark:bg-emerald-500/10 dark:text-emerald-400' : 'text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' ?>">Laporan Laba/Rugi</a>
                         </div>
                     </div>
                 </div>
 
                 <!-- Modul HRD (Submenu) -->
                 <div x-data="{ open: false }">
-                    <button @click="open = !open" class="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white">
-                        <div class="flex items-center gap-3">
-                            <i class="ph ph-users-three text-lg"></i>
+                    <button @click="open = !open" class="group w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white">
+                        <div class="flex items-center gap-2">
+                            <i class="ph ph-users-three text-base text-amber-500 dark:text-amber-400 group-hover:scale-110 transition-transform"></i>
                             <span>HRD</span>
                         </div>
-                        <i class="ph ph-caret-down text-xs transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+                        <i class="ph ph-caret-down text-[10px] transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
                     </button>
                     <div x-show="open" x-collapse>
-                        <div class="pl-10 pr-3 py-1 mt-1 space-y-1 border-l-2 border-slate-800 ml-4">
-                            <a href="#" class="block px-3 py-2 rounded-md text-sm transition-colors hover:bg-slate-800 hover:text-white">Pegawai</a>
-                            <a href="#" class="block px-3 py-2 rounded-md text-sm transition-colors hover:bg-slate-800 hover:text-white">Penggajian</a>
-                            <a href="#" class="block px-3 py-2 rounded-md text-sm transition-colors hover:bg-slate-800 hover:text-white">Absensi</a>
+                        <div class="pl-8 pr-2 py-0.5 mt-0.5 space-y-0.5 border-l border-gray-200 dark:border-slate-700 ml-4">
+                            <a href="#" class="block px-2 py-1.5 rounded text-xs transition-colors <?= uri_string() == 'hrd/employees' ? 'bg-amber-50 text-amber-700 font-semibold dark:bg-amber-500/10 dark:text-amber-400' : 'text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' ?>">Pegawai</a>
+                            <a href="#" class="block px-2 py-1.5 rounded text-xs transition-colors <?= uri_string() == 'hrd/payroll' ? 'bg-amber-50 text-amber-700 font-semibold dark:bg-amber-500/10 dark:text-amber-400' : 'text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' ?>">Penggajian</a>
+                            <a href="#" class="block px-2 py-1.5 rounded text-xs transition-colors <?= uri_string() == 'hrd/attendance' ? 'bg-amber-50 text-amber-700 font-semibold dark:bg-amber-500/10 dark:text-amber-400' : 'text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' ?>">Absensi</a>
                         </div>
                     </div>
                 </div>
 
-                <div class="pt-4 pb-2">
-                    <p class="px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Pengaturan</p>
+                <!-- Contoh Modul Tambahan untuk demo kekompakan -->
+                <a href="#" class="group flex items-center gap-2 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white">
+                    <i class="ph ph-truck text-base text-orange-500 dark:text-orange-400 group-hover:scale-110 transition-transform"></i>
+                    <span>Logistik & Ekspedisi</span>
+                </a>
+                <a href="#" class="group flex items-center gap-2 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white">
+                    <i class="ph ph-shopping-cart text-base text-purple-500 dark:text-purple-400 group-hover:scale-110 transition-transform"></i>
+                    <span>Pembelian (Purchasing)</span>
+                </a>
+                <a href="#" class="group flex items-center gap-2 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white">
+                    <i class="ph ph-megaphone text-base text-pink-500 dark:text-pink-400 group-hover:scale-110 transition-transform"></i>
+                    <span>Marketing</span>
+                </a>
+                <a href="#" class="group flex items-center gap-2 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white">
+                    <i class="ph ph-wrench text-base text-teal-500 dark:text-teal-400 group-hover:scale-110 transition-transform"></i>
+                    <span>Maintenance</span>
+                </a>
+                <a href="#" class="group flex items-center gap-2 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white">
+                    <i class="ph ph-handshake text-base text-rose-500 dark:text-rose-400 group-hover:scale-110 transition-transform"></i>
+                    <span>CRM & Klien</span>
+                </a>
+
+                <div class="pt-3 pb-1">
+                    <p class="px-3 text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">Pengaturan</p>
                 </div>
 
                 <!-- Manajemen Pengguna -->
-                <a href="<?= base_url('users') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white <?= strpos(uri_string(), 'users') === 0 ? 'bg-blue-600/10 text-blue-400' : '' ?>">
-                    <i class="ph ph-shield-check text-lg"></i>
+                <a href="<?= base_url('users') ?>" class="group flex items-center gap-2 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white <?= strpos(uri_string(), 'users') === 0 ? 'bg-blue-50 text-blue-700 dark:bg-blue-600/10 dark:text-blue-400' : '' ?>">
+                    <i class="ph ph-shield-check text-base text-sky-500 dark:text-sky-400 group-hover:scale-110 transition-transform"></i>
                     <span>Manajemen Pengguna</span>
                 </a>
                 
                 <!-- Konfigurasi Sistem -->
-                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white">
-                    <i class="ph ph-gear text-lg"></i>
+                <a href="#" class="group flex items-center gap-2 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white">
+                    <i class="ph ph-gear text-base text-slate-500 dark:text-slate-400 group-hover:scale-110 transition-transform"></i>
                     <span>Konfigurasi Sistem</span>
                 </a>
             </div>
 
             <!-- User Profile Area di Sidebar -->
-            <div class="p-4 border-t border-slate-800 bg-slate-950 shrink-0">
-                <div class="flex items-center gap-3">
-                    <img src="https://ui-avatars.com/api/?name=Admin+ERP&background=random" alt="Avatar" class="w-10 h-10 rounded-full border border-slate-700">
+            <div class="p-3 border-t border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 shrink-0">
+                <div class="flex items-center gap-2">
+                    <img src="https://ui-avatars.com/api/?name=Admin+ERP&background=random" alt="Avatar" class="w-8 h-8 rounded border border-gray-300 dark:border-slate-700">
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-white truncate">Administrator</p>
-                        <p class="text-xs text-slate-400 truncate">Superadmin</p>
+                        <p class="text-[13px] font-medium text-gray-900 dark:text-white truncate">Administrator</p>
+                        <p class="text-[11px] text-gray-500 dark:text-slate-400 truncate">Superadmin</p>
                     </div>
-                    <button class="text-slate-400 hover:text-red-400 transition-colors" title="Logout">
-                        <i class="ph ph-sign-out text-xl"></i>
+                    <button class="text-gray-400 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors p-1" title="Logout">
+                        <i class="ph ph-sign-out text-lg"></i>
                     </button>
                 </div>
             </div>
         </aside>
 
         <!-- Main Content Wrapper -->
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50">
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
             
             <!-- Topbar (Header) -->
-            <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 z-10 shrink-0">
+            <header class="h-14 bg-white dark:bg-slate-950 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 z-10 shrink-0 transition-colors duration-300">
                 <!-- Left: Menu Button & Breadcrumb -->
-                <div class="flex items-center gap-4">
-                    <button @click="sidebarOpen = true" class="lg:hidden p-2 -ml-2 rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-                        <i class="ph ph-list text-2xl"></i>
+                <div class="flex items-center gap-3">
+                    <button @click="sidebarOpen = true" class="lg:hidden p-2 -ml-2 rounded-md text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-700 dark:hover:text-slate-200 transition-colors">
+                        <i class="ph ph-list text-xl"></i>
                     </button>
                     
                     <nav class="hidden sm:flex" aria-label="Breadcrumb">
-                        <ol class="flex items-center space-x-2 text-sm text-gray-500">
-                            <li><a href="#" class="hover:text-blue-600 transition-colors"><i class="ph ph-house"></i></a></li>
+                        <ol class="flex items-center space-x-2 text-[13px] text-gray-500 dark:text-slate-400">
+                            <li><a href="#" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><i class="ph ph-house"></i></a></li>
                             <li><i class="ph ph-caret-right text-xs"></i></li>
-                            <li><span class="text-gray-900 font-medium"><?= $title ?? 'Dashboard' ?></span></li>
+                            <li><span class="text-gray-900 dark:text-slate-200 font-medium"><?= $title ?? 'Dashboard' ?></span></li>
                         </ol>
                     </nav>
                 </div>
@@ -157,13 +189,18 @@
                     <!-- Global Search -->
                     <div class="relative hidden md:block">
                         <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" placeholder="Pencarian cepat (Ctrl+K)" class="pl-10 pr-4 py-2 w-64 text-sm bg-gray-100 border-transparent rounded-full focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-400">
+                        <input type="text" placeholder="Pencarian cepat (Ctrl+K)" class="pl-10 pr-4 py-2 w-64 text-sm bg-gray-100 dark:bg-slate-800 border-transparent rounded-full focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-400 dark:placeholder-slate-500 dark:text-slate-200">
                     </div>
 
+                    <!-- Dark Mode Toggle -->
+                    <button @click="darkMode = !darkMode" class="w-9 h-9 flex items-center justify-center rounded-full text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" title="Toggle Dark/Light Mode">
+                        <i class="text-xl" :class="darkMode ? 'ph ph-sun' : 'ph ph-moon'"></i>
+                    </button>
+
                     <!-- Notification -->
-                    <button class="relative p-2 rounded-full text-gray-500 hover:bg-gray-100 transition-colors">
+                    <button class="relative w-9 h-9 flex items-center justify-center rounded-full text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
                         <i class="ph ph-bell text-xl"></i>
-                        <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                        <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-950"></span>
                     </button>
                 </div>
             </header>
