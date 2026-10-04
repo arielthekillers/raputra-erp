@@ -109,6 +109,20 @@ if ($result['status'] === 'success') {
 }
 ```
 
+### Cetak Dokumen PDF (PDF Generator)
+Sistem memiliki pustaka `App\Libraries\PdfGenerator` yang membungkus *Dompdf*. Sangat berguna untuk mencetak Slip Gaji, Invoice, atau Laporan.
+
+**Cara Pakai (Controller):**
+```php
+$pdf = new \App\Libraries\PdfGenerator();
+$data = ['nama' => 'Budi', 'gaji' => 5000000];
+// Render HTML dari view (pastikan view berisi sintaks HTML/CSS untuk kertas)
+$html = view('modul/slip_gaji_pdf', $data);
+
+// Parameter: HTML, Nama File, Ukuran Kertas, Orientasi, Stream (true = langsung tampil di browser)
+$pdf->generate($html, 'Slip_Gaji_Budi', 'A4', 'portrait', true);
+```
+
 ## 5. Estetika (Wajib)
 Selalu gunakan *Dark Mode Support* dengan prefix `dark:`. Gunakan warna-warna premium (*slate*, *emerald*, *blue*) dan perhatikan kerapian *padding*, *margin*, dan sudut `rounded-lg` atau `rounded-xl`. Gunakan ikon *Phosphor* (`ph ph-nama-ikon`) bukan *FontAwesome*.
 
