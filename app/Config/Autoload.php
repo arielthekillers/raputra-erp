@@ -40,6 +40,7 @@ class Autoload extends AutoloadConfig
     public $psr4 = [
         APP_NAMESPACE => APPPATH,
         'Modules\Inventory' => ROOTPATH . 'Modules/Inventory',
+        'Modules\UserManagement' => ROOTPATH . 'Modules/UserManagement',
     ];
 
     /**
