@@ -10,6 +10,8 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <!-- Phosphor Icons (Menggunakan jsdelivr karena unpkg terkadang lambat) -->
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
+    <!-- SweetAlert2 untuk Popup & Toasts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -157,9 +159,9 @@
                         <p class="text-[13px] font-medium text-gray-900 dark:text-white truncate">Administrator</p>
                         <p class="text-[11px] text-gray-500 dark:text-slate-400 truncate">Superadmin</p>
                     </div>
-                    <button class="text-gray-400 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors p-1" title="Logout">
+                    <a href="<?= url_to('logout') ?>" class="text-gray-400 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors p-1" title="Logout">
                         <i class="ph ph-sign-out text-lg"></i>
-                    </button>
+                    </a>
                 </div>
             </div>
         </aside>
@@ -175,13 +177,10 @@
                         <i class="ph ph-list text-xl"></i>
                     </button>
                     
-                    <nav class="hidden sm:flex" aria-label="Breadcrumb">
-                        <ol class="flex items-center space-x-2 text-[13px] text-gray-500 dark:text-slate-400">
-                            <li><a href="#" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><i class="ph ph-house"></i></a></li>
-                            <li><i class="ph ph-caret-right text-xs"></i></li>
-                            <li><span class="text-gray-900 dark:text-slate-200 font-medium"><?= $title ?? 'Dashboard' ?></span></li>
-                        </ol>
-                    </nav>
+                    <!-- Optional: Left Topbar Item -->
+                    <div class="hidden sm:block text-sm font-medium text-gray-500 dark:text-slate-400">
+                        <!-- Topbar info can go here -->
+                    </div>
                 </div>
 
                 <!-- Right: Actions -->
@@ -207,17 +206,46 @@
 
             <!-- Main Content Area -->
             <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-                <div class="max-w-7xl mx-auto">
-                    <!-- Alert / Flash Messages Placeholder -->
-                    <!-- 
-                    <div class="mb-6 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 flex gap-3">
-                        <i class="ph ph-info mt-0.5 text-lg"></i>
-                        <div class="text-sm">Notifikasi sistem akan muncul di sini.</div>
-                    </div> 
-                    -->
+                <div class="max-w-7xl mx-auto space-y-6">
+                    
+                    <!-- PAGE HEADER START -->
+                    <?php if ($this->renderSection('page_title')): ?>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <!-- Left: Title, Subtitle, Breadcrumb -->
+                        <div>
+                            <!-- Breadcrumbs -->
+                            <nav class="flex mb-1.5" aria-label="Breadcrumb">
+                                <ol class="flex items-center space-x-2 text-[13px] text-gray-500 dark:text-slate-400">
+                                    <li><a href="<?= base_url() ?>" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><i class="ph ph-house"></i></a></li>
+                                    <?= $this->renderSection('breadcrumb') ?>
+                                </ol>
+                            </nav>
+                            <!-- Heading -->
+                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                                <?= $this->renderSection('page_title') ?>
+                            </h1>
+                            <!-- Subheading -->
+                            <?php if ($this->renderSection('page_subtitle')): ?>
+                            <p class="text-sm text-gray-500 dark:text-slate-400 mt-1">
+                                <?= $this->renderSection('page_subtitle') ?>
+                            </p>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Right: Action Buttons -->
+                        <div class="flex items-center gap-2 sm:gap-3">
+                            <?= $this->renderSection('page_actions') ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                    <!-- PAGE HEADER END -->
+
+                    <!-- Flash Messages (Diganti dengan SweetAlert Toast di bagian bawah) -->
 
                     <!-- Injected Content -->
-                    <?= $this->renderSection('content') ?>
+                    <div class="pb-10">
+                        <?= $this->renderSection('content') ?>
+                    </div>
                 </div>
             </main>
         </div>
@@ -238,6 +266,69 @@
         }
         /* Alpine x-collapse transition bug fix */
         [x-cloak] { display: none !important; }
+        
+        /* SweetAlert2 Custom Dark Mode Tweaks */
+        body.dark .swal2-popup {
+            background: #1e293b !important; /* slate-800 */
+            color: #f1f5f9 !important; /* slate-100 */
+        }
+        body.dark .swal2-title { color: #f8fafc !important; }
+        body.dark .swal2-html-container { color: #cbd5e1 !important; }
     </style>
+
+    <!-- Script Global untuk Toast Flash Messages -->
+    <script>
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 4000,
+            timerProgressBar: true,
+            background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff',
+            color: document.documentElement.classList.contains('dark') ? '#f1f5f9' : '#1e293b',
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
+        <?php if (session()->getFlashdata('success')) : ?>
+            Toast.fire({ icon: 'success', title: '<?= addslashes(session()->getFlashdata('success')) ?>' });
+        <?php endif; ?>
+        
+        <?php if (session()->getFlashdata('error')) : ?>
+            Toast.fire({ icon: 'error', title: '<?= addslashes(session()->getFlashdata('error')) ?>' });
+        <?php endif; ?>
+
+        <?php if (session()->getFlashdata('info')) : ?>
+            Toast.fire({ icon: 'info', title: '<?= addslashes(session()->getFlashdata('info')) ?>' });
+        <?php endif; ?>
+        
+        <?php if (session()->getFlashdata('warning')) : ?>
+            Toast.fire({ icon: 'warning', title: '<?= addslashes(session()->getFlashdata('warning')) ?>' });
+        <?php endif; ?>
+
+        // Fungsi Helper Global untuk Konfirmasi Hapus/Aksi Berbahaya
+        function confirmAction(title, text, confirmButtonText, callback) {
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444', // red-500
+                cancelButtonColor: '#64748b', // slate-500
+                confirmButtonText: confirmButtonText,
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    callback();
+                }
+            });
+        }
+    </script>
+    
+    <!-- Render custom scripts from views -->
+    <?= $this->renderSection('scripts') ?>
 </body>
 </html>
