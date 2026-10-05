@@ -73,9 +73,18 @@ JANGAN gunakan `alert()` atau `confirm()` standar peramban. Gunakan helper globa
 </button>
 ```
 
-### CRUD Pop-Up (Modal)
+### CRUD Pop-Up (Modal) & Form UI
 Operasi CRUD form diusahakan menggunakan Pop-up/Modal. 
 Gunakan kerangka **Alpine.js** (`x-data="{ open: false }"`) untuk membuat modal yang reaktif langsung di dalam View. JANGAN arahkan ke halaman (*page*) form terpisah bila bisa diselesaikan di dalam satu halaman manajemen utama.
+
+**Standar Desain Modal Premium (Wajib Diikuti):**
+1. **Header Seamless:** Judul dan subjudul form dibuat menyatu dengan body form (latar belakang disamakan, contoh: `bg-white dark:bg-slate-800`), teks judul besar (`text-2xl font-bold`), tanpa border bawah.
+2. **Input Modern:** Gunakan `bg-gray-50 dark:bg-slate-700/50` dengan `border-transparent` dan ujung membulat (`rounded-xl`). Berikan batas menyala saat *focus* (contoh: `focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10`).
+3. **Ikon Input:** Tambahkan ikon *Phosphor* abu-abu secara *absolute* di dalam *input field* (`left-4`, dengan *padding left* pada input `pl-11`).
+4. **Footer Seamless & Tombol:** Area tombol dibuat tanpa latar belakang yang kontras (hilangkan garis batas/latar belakang abu-abu pada modal standar). Tombol utama diberikan bayangan berpendar (`shadow-lg shadow-blue-500/30`).
+5. **Animasi Loading:**
+   - **Form Simpan/Ubah:** Gunakan Alpine.js `<form ... x-data="{ isSubmitting: false }" @submit="isSubmitting = true">`. Tambahkan `ph-spinner` berputar dan ubah teks tombol menjadi "Menyimpan..." saat diklik.
+   - **Hapus Data:** Tombol *SweetAlert* otomatis menangani *loading spinner* ketika helper `confirmAction()` digunakan.
 
 ### Paginasi (Pagination)
 CodeIgniter 4 Pager sudah diatur *default* menggunakan `App\Views\Pagers\tailwind`.

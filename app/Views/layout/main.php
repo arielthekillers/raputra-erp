@@ -319,10 +319,17 @@
                 cancelButtonColor: '#64748b', // slate-500
                 confirmButtonText: confirmButtonText,
                 cancelButtonText: 'Batal',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    callback();
+                reverseButtons: true,
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    const result = callback();
+                    if (result && result.then) {
+                        return result;
+                    }
+                    return new Promise((resolve) => {
+                        // Membiarkan loading tetap berputar saat halaman berganti
+                        setTimeout(() => resolve(), 3000); 
+                    });
                 }
             });
         }

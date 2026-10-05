@@ -11,6 +11,8 @@ $routes->get('/', 'Home::index');
 $routes->group('users', ['namespace' => 'Modules\UserManagement\Controllers'], static function ($routes) {
     $routes->get('/', 'UserController::index');
     $routes->post('store', 'UserController::store');
+    $routes->post('update', 'UserController::update');
+    $routes->get('delete/(:num)', 'UserController::delete/$1');
 });
 
 service('auth')->routes($routes);
